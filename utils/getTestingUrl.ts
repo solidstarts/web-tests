@@ -1,6 +1,6 @@
 import { isProd } from "./isProd";
 
-export function getTestingUrl(path: string, queryParams: Record<string, string> = {}) {
+export function getTestingUrl(path: string = '', queryParams: Record<string, string> = {}) {
     const testingUrl = process.env.TESTING_URL;
 
     const baseUrl: string = testingUrl ? testingUrl : isProd() 

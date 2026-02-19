@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { test, devices } from '@playwright/test';
+import { getTestingUrl } from "../../utils/getTestingUrl";
 
 test.use({
   ...devices[process.env.DEVICE as string],
@@ -14,7 +15,7 @@ const testCases: [string, boolean][] = [
 ]
 
 test('test', async ({ page }) => {
-    await page.goto('https://welcome.solidstarts.com/');
+    await page.goto(getTestingUrl('apple/welcome'));
     await page.getByRole('button', { name: 'Girl' }).click();
     for (const testcase of testCases) {
         await fillName(page, testcase[0])
