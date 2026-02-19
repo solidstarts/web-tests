@@ -11,7 +11,6 @@ const testCases: [string, boolean][] = [
     [`O'neil`, true],
     ['12345', true],
     ['Mary Popins', true]
-
 ]
 
 test('test', async ({ page }) => {

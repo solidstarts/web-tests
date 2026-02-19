@@ -1,7 +1,7 @@
 import { test, devices } from '@playwright/test';
-import { wfTest } from '../helpers/wf.helper';
-import { getTestingUrl } from '../utils/getTestingUrl';
-import { getCardDetails } from '../utils/getCardNumber';
+import { wfTest } from '../../helpers/wf.helper';
+import { getTestingUrl } from '../../utils/getTestingUrl';
+import { getCardDetails } from '../../utils/getCardNumber';
 
 test.use({
   ...devices[process.env.DEVICE as string],

@@ -9,3 +9,4 @@ testnumber.txt
 .env.development
 .env.test
 .env.production
+playwright-report
