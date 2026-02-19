@@ -5,7 +5,7 @@ dotenvConfig();
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 60_000,
+  timeout: 180_000, // 3 minutes to allow for full test flow including waitForURL calls
   retries: 0,
   use: {
     headless: false,

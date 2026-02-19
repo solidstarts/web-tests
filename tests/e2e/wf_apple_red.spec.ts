@@ -8,11 +8,10 @@ test.use({
 });
 
 const childName = 'Mary'
-const shouldPay = false
+const shouldPay = process.env.SHOULD_PAY === 'true'
 
 test('test', async ({ page }) => {
   await wfTest(page, getTestingUrl('apple/welcome', {
     pw:'red'
-  }), childName, getCardDetails(), 29.99, shouldPay);
+  }), childName, getCardDetails(), [14.99, 7.49], shouldPay);
 });
-

@@ -2,7 +2,7 @@ import { expect, Page } from "@playwright/test";
 import { uniqueEmail } from "../utils/testdata";
 import { CreditCard } from "../utils/getCardNumber";
 
-export async function wfTest(page: Page, url: string, childName: string, cardDetails: CreditCard, priceBeforeDiscount: number, shouldPay: boolean=true) {
+export async function wfTest(page: Page, url: string, childName: string, cardDetails: CreditCard, priceAfterDiscount: [number, number], shouldPay: boolean=true) {
     validateCardDetails(cardDetails);
     
     await page.goto(url);
@@ -14,7 +14,7 @@ export async function wfTest(page: Page, url: string, childName: string, cardDet
     await completeMeetVenus(page);
     await completeMeetDoctorRuiz(page);
     const email = await enterEmailAndContinue(page);
-    await handlePersonalPlanAndPayment(page, email, cardDetails, priceBeforeDiscount, shouldPay);
+    await handlePersonalPlanAndPayment(page, email, cardDetails, priceAfterDiscount, shouldPay);
 }
 
 function validateCardDetails(cardDetails: CreditCard) {
@@ -111,7 +111,7 @@ async function enterEmailAndContinue(page: Page): Promise<string> {
     return email;
 }
 
-async function handlePersonalPlanAndPayment(page: Page, email: string, cardDetails: CreditCard, priceBeforeDiscount: number, shouldPay: boolean) {
+async function handlePersonalPlanAndPayment(page: Page, email: string, cardDetails: CreditCard, priceAfterDiscount: [number, number], shouldPay: boolean) {
     await page.waitForTimeout(2000);
     await page.getByRole('button', { name: 'Got it' }).click();
     await page.getByText('Guided introduction to 100').click();
@@ -121,7 +121,9 @@ async function handlePersonalPlanAndPayment(page: Page, email: string, cardDetai
         await page.waitForURL(new RegExp(`/apple/checkout`), { timeout: 60_000 });
         await page.getByRole('link', { name: 'Back' }).click();
         await page.waitForURL(new RegExp(`/apple/secondary-paywall`), { timeout: 60_000 });
-        await page.getByRole('button', { name: `1 WEEK PLAN $${priceBeforeDiscount} USD • Now` }).first().click();
+        const planButton = page.getByRole('button', { name: /1 WEEK PLAN/i }).first();
+        await expect(planButton).toContainText(`Now $${priceAfterDiscount[1].toString()} USD`);
+        await planButton.click();
         await page.getByRole('button', { name: 'Get started' }).first().click();
         await page.waitForURL(new RegExp(`/apple/checkout`), { timeout: 60_000 });
         await payment(page, cardDetails);
@@ -129,7 +131,8 @@ async function handlePersonalPlanAndPayment(page: Page, email: string, cardDetai
         await page.waitForURL(new RegExp(`/apple/download-signup-paid`), { timeout: 60_000 });
         await expect(page.getByText('It\'s time to download the app.')).toBeVisible({ timeout: 30_000 });
     } else {
-        await page.waitForTimeout(15_000);
+        const planButton = page.getByRole('button', { name: /1 WEEK PLAN/i }).first();
+        await expect(planButton).toContainText(`$${priceAfterDiscount[0].toString()} USD`);
     }
 }
 
