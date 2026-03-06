@@ -1,4 +1,4 @@
-# Mary Tests
+# Web Tests
 
 Playwright end-to-end tests for the Solid Starts web funnel, emulating an iPhone 15 Pro Max.
 
