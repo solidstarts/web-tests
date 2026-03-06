@@ -6,14 +6,55 @@ export async function wfTest(page: Page, url: string, childName: string, cardDet
     validateCardDetails(cardDetails);
     
     await page.goto(url);
-    await selectGenderAndName(page, childName);
+    await selectGender(page, 'Girl');
+    await selectName(page, childName);
     await selectBirthDate(page);
+    await next(page, 'link');
+    await page.getByRole('button', { name: 'No' }).click();
+    await page.getByRole('img', { name: 'Kim Grenawitzke' }).click();
+    await next(page, 'link');
     await completeInitialQuestions(page);
-    await completeReadinessAssessment(page);
+    await completeReadinessAssessment(page, true);
+    await next(page, 'link');
     await completeAllergyQuestions(page);
-    await completeMeetVenus(page);
-    await completeMeetDoctorRuiz(page);
+    await completeEczemaQuestions(page, false);
+    await meetDoctor(page, 'meet-venus');
+    await page.getByRole('button', { name: 'Both' }).click();
+    await page.getByRole('button', { name: 'Both' }).click();
+    await completeSuppliments(page);
+    await meetDoctor(page, 'meet-doctor-ruiz');
+    await medicalConcers(page);
     const email = await enterEmailAndContinue(page);
+    await page.getByRole('button', { name: 'Got it' }).click();
+    await page.getByText('Guided introduction to 100').click();
+    await handlePersonalPlanAndPayment(page, email, cardDetails, priceAfterDiscount, shouldPay);
+}
+
+export async function wfTestOrange(page: Page, url: string, childName: string, cardDetails: CreditCard, priceAfterDiscount: [number, number], shouldPay: boolean=true) {
+    await page.goto(url);
+    await selectGender(page, 'Girl');
+    await page.getByRole('button', { name: 'Yes' }).click();
+    await selectAge(page);
+
+    await next(page, 'link');
+    await selectName(page, childName);
+    await next(page, 'link');
+    
+    await completeInitialQuestions(page);
+    await completeReadinessAssessment(page, false);
+    await completeAllergyQuestions(page);
+    await completeEczemaQuestions(page, true);
+
+    await page.getByRole('button', { name: 'Both' }).click();
+    await next(page);
+    await page.getByRole('button', { name: 'Both' }).click();
+    
+    await next(page);
+    await page.getByRole('link', { name: 'Got it' }).click();
+    await completeSuppliments(page);
+    await medicalConcers(page);
+    const email = await enterEmailAndContinue(page);
+    await page.getByRole('link', { name: 'Claim plan' }).click();
     await handlePersonalPlanAndPayment(page, email, cardDetails, priceAfterDiscount, shouldPay);
 }
 
@@ -23,28 +64,38 @@ function validateCardDetails(cardDetails: CreditCard) {
     expect(cardDetails.number).toBeDefined();
 }
 
-async function selectGenderAndName(page: Page, childName: string) {
-    await page.getByRole('button', { name: 'Girl' }).click();
+async function selectGender(page: Page, gender: string) {
+    await page.getByRole('button', { name: gender }).click();
+}
+
+async function selectName(page: Page, name: string) {
     await page.getByRole('textbox', { name: 'Type Name' }).click();
-    await page.getByRole('textbox', { name: 'Type Name' }).fill(childName);
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('textbox', { name: 'Type Name' }).fill(name);
+    await next(page);
 }
 
 async function selectBirthDate(page: Page) {
     await page.getByRole('button', { name: '2025' }).click();
     await page.getByRole('button', { name: 'September' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await next(page);
 }
 
-async function completeInitialQuestions(page: Page) {
-    await page.getByRole('link', { name: 'Next' }).click();
-    await page.getByRole('button', { name: 'No' }).click();
-    await page.getByRole('img', { name: 'Kim Grenawitzke' }).click();
-    await page.getByRole('link', { name: 'Next' }).click();
+async function selectAge(page: Page, age: string='6 months') {
+    await page.getByRole('button', { name: age }).click();
+}
+
+async function next(page: Page, type: 'button' | 'link' = 'button') {
+    await page.getByRole(type, { name: 'Next' }).click();
+
+}
+
+async function completeInitialQuestions(page: Page, withNext: boolean=true) {
     await page.getByRole('button', { name: 'Purees' }).click();
+    if (withNext) await next(page);
     await page.getByRole('button', { name: 'Yes' }).click();
     await page.getByRole('link', { name: 'Got it' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
+    if (withNext) await next(page);
     await page.getByRole('link', { name: 'Got it' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
     await page.getByRole('link', { name: 'Got it' }).click();
@@ -52,83 +103,98 @@ async function completeInitialQuestions(page: Page) {
     await page.getByRole('link', { name: 'Got it' }).click();
 }
 
-async function completeReadinessAssessment(page: Page) {
-    await page.waitForURL(new RegExp(`/apple/readiness-assessment`), { timeout: 60_000 });
-    await page.getByRole('link', { name: 'Let\'s go' }).click();
-    await page.getByRole('button', { name: 'Choking prevention' }).click();
+async function completeReadinessAssessment(page: Page, hasLetGoAndReadinessAssessment: boolean) {
+    if (hasLetGoAndReadinessAssessment) await page.waitForURL(new RegExp(`/readiness-assessment`), { timeout: 60_000 });
+    if (hasLetGoAndReadinessAssessment) await page.getByRole('link', { name: 'Let\'s go' }).click();
+    await page.waitForURL(new RegExp(`/top-concerns`), { timeout: 60_000 });
     await page.getByRole('button', { name: 'Baby not eating' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await next(page);
     await page.getByRole('link', { name: 'Let\'s go' }).click();
-    await page.getByRole('link', { name: 'Next' }).click();
+
 }
 
 async function completeAllergyQuestions(page: Page) {
     await page.getByRole('button', { name: 'Egg' }).click();
-    await page.getByRole('button', { name: 'Egg' }).click();
     await page.getByRole('button', { name: 'Dairy' }).click();
     await page.getByRole('button', { name: 'Peanut' }).click();
     await page.getByRole('button', { name: 'Dairy' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByRole('button', { name: 'No eczema' }).click();
-    await page.getByRole('link', { name: 'Next' }).click();
+    await next(page);
+}
+
+async function completeEczemaQuestions(page: Page, hasEczema: boolean) {
+    if (hasEczema) {
+        await next(page, 'link');
+        await page.getByRole('button', { name: 'Mild eczema' }).click();
+        await next(page);
+        await page.getByRole('link', { name: 'Got it' }).click();
+    } else {
+        await page.getByRole('button', { name: 'No eczema' }).click();
+        await next(page, 'link');
+    }
 }
 
 async function completeMeetVenus(page: Page) {
-    await page.waitForURL(new RegExp(`/apple/meet-venus`), { timeout: 60_000 });
-    await page.getByRole('link', { name: 'Next' }).click();
-    await page.getByRole('button', { name: 'Both' }).click();
-    await page.getByRole('button', { name: 'Bottlefeed' }).click();
     await page.getByRole('button', { name: 'Iron' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
+    await next(page);
     await page.getByRole('button', { name: 'Kosher' }).click();
     await page.getByRole('button', { name: 'Grain-Free' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByRole('link', { name: 'Next' }).click();
+    await next(page);
+    await next(page, 'link');
 }
 
-async function completeMeetDoctorRuiz(page: Page) {
-    await page.waitForURL(new RegExp(`/apple/meet-doctor-ruiz`), { timeout: 60_000 });
-    await page.getByRole('link', { name: 'Next' }).click();
+async function meetDoctor(page: Page, url: string) {
+    await page.waitForURL(new RegExp(`/${url}`), { timeout: 60_000 });
+    await next(page, 'link');
+}
+
+async function medicalConcers(page: Page) {
     await page.getByRole('button', { name: 'Yes' }).click();
     await page.getByRole('button', { name: 'No' }).click();
     await page.getByRole('button', { name: 'Reflux' }).click();
     await page.getByRole('button', { name: 'Oral restriction' }).click();
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.getByRole('link', { name: 'Next' }).click();
+    await next(page);
+    await next(page, 'link');
+}
+
+async function completeSuppliments(page: Page) {
+    await page.getByRole('button', { name: 'Iron' }).click();
+    await next(page);
+    await page.getByRole('button', { name: 'Kosher' }).click();
+    await page.getByRole('button', { name: 'Grain-Free' }).click();
+    await next(page);
+    await next(page, 'link');
 }
 
 async function enterEmailAndContinue(page: Page): Promise<string> {
-    await page.waitForURL(new RegExp(`/apple/enter-email`), { timeout: 60_000 });
+    await page.waitForURL(new RegExp(`/enter-email`), { timeout: 60_000 });
     
     const email = uniqueEmail({ domain: 'solidstarts.com', prefix: 'mary+wf' });
     console.log('Email used for test:', email);
     
     await page.getByRole('textbox', { name: 'Email' }).click();
     await page.getByRole('textbox', { name: 'Email' }).fill(email);
-    await page.getByRole('button', { name: 'Next' }).click();
-    await page.waitForURL(new RegExp(`/apple/personal-plan`), { timeout: 60_000 });
+    await next(page);
+    await page.waitForURL(new RegExp(`/personal-plan`), { timeout: 60_000 });
     
     return email;
 }
 
 async function handlePersonalPlanAndPayment(page: Page, email: string, cardDetails: CreditCard, priceAfterDiscount: [number, number], shouldPay: boolean) {
     await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Got it' }).click();
-    await page.getByText('Guided introduction to 100').click();
     
     if (shouldPay) {
         await page.getByRole('button', { name: 'Get started' }).first().click();
-        await page.waitForURL(new RegExp(`/apple/checkout`), { timeout: 60_000 });
+        await page.waitForURL(new RegExp(`/checkout`), { timeout: 60_000 });
         await page.getByRole('link', { name: 'Back' }).click();
-        await page.waitForURL(new RegExp(`/apple/secondary-paywall`), { timeout: 60_000 });
+        await page.waitForURL(new RegExp(`/secondary-paywall`), { timeout: 60_000 });
         const planButton = page.getByRole('button', { name: /1 WEEK PLAN/i }).first();
         await expect(planButton).toContainText(`Now $${priceAfterDiscount[1].toString()} USD`);
         await planButton.click();
         await page.getByRole('button', { name: 'Get started' }).first().click();
-        await page.waitForURL(new RegExp(`/apple/checkout`), { timeout: 60_000 });
+        await page.waitForURL(new RegExp(`/checkout`), { timeout: 60_000 });
         await payment(page, cardDetails);
         await signUp(page, email);
-        await page.waitForURL(new RegExp(`/apple/download-signup-paid`), { timeout: 60_000 });
+        await page.waitForURL(new RegExp(`/download-signup-paid`), { timeout: 60_000 });
         await expect(page.getByText('It\'s time to download the app.')).toBeVisible({ timeout: 30_000 });
     } else {
         const planButton = page.getByRole('button', { name: /1 WEEK PLAN/i }).first();
@@ -149,7 +215,7 @@ async function payment(page: Page, cardDetails: CreditCard) {
 }
 
 async function signUp(page: Page, email: string) {
-    await page.waitForURL(new RegExp(`/apple/signup-paid`), { timeout: 60_000 });
+    await page.waitForURL(new RegExp(`/signup-paid`), { timeout: 60_000 });
     await page.getByRole('textbox', { name: 'Password*' }).click();
     await page.getByRole('textbox', { name: 'Password*' }).fill(email);
     await page.getByRole('button', { name: 'Create account & Sync' }).click();
