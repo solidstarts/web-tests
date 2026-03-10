@@ -26,6 +26,7 @@ export async function wfTest(page: Page, url: string, childName: string, cardDet
     await meetDoctor(page, 'meet-doctor-ruiz');
     await medicalConcers(page);
     const email = await enterEmailAndContinue(page);
+    await page.waitForTimeout(2000);
     await page.getByRole('button', { name: 'Got it' }).click();
     await page.getByText('Guided introduction to 100').click();
     await handlePersonalPlanAndPayment(page, email, cardDetails, priceAfterDiscount, shouldPay);

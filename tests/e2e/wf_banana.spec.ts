@@ -85,6 +85,7 @@ async function wfTestBanana(page: Page, url: string, childName: string, cardDeta
   await page.waitForTimeout(2000);
   await next(page, 'link');
   const email = await enterEmailAndContinue(page);
+  await page.waitForTimeout(2000);
   await next(page, 'link');
   await handlePersonalPlanAndPayment(page, email, cardDetails, priceAfterDiscount, shouldPay);
   // await payment(page, cardDetails);
