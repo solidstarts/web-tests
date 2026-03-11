@@ -1,6 +1,8 @@
 import { expect, Page } from "@playwright/test";
 import { test, devices } from '@playwright/test';
 import { getTestingUrl } from "../../utils/getTestingUrl";
+import { selectAge } from "../../helpers/wf.helper";
+import { next } from "../../helpers/wf.helper";
 
 test.use({
   ...devices[process.env.DEVICE as string],
@@ -15,8 +17,11 @@ const testCases: [string, boolean][] = [
 ]
 
 test('test', async ({ page }) => {
-    await page.goto(getTestingUrl('apple/welcome'));
+    await page.goto(getTestingUrl('orange'));
     await page.getByRole('button', { name: 'Girl' }).click();
+    await page.getByRole('button', { name: 'Yes' }).click();
+    await selectAge(page);
+    await next(page, 'link');
     for (const testcase of testCases) {
         await fillName(page, testcase[0])
         await checkButtonEnabled(page, testcase[1])
