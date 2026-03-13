@@ -6,7 +6,7 @@ test.use({
 });
 
 const funnels = ['apple', 'orange', 'banana'];
-const allergyOptions = ['Kosher', 'Halal', 'Vegan', 'Other', 'Grain-free'];
+const dietOptions = ['Kosher', 'Halal', 'Vegan', 'Other', 'Grain-free'];
 
 async function getOptionElement(page: any, optionName: string) {
   const button = page.getByRole('button', { name: optionName });
@@ -95,7 +95,7 @@ for (const funnel of funnels) {
       await clickOption(page, 'No');
 
       expect(await isOptionSelected(page, 'No')).toBe(true);
-      for (const option of allergyOptions) {
+      for (const option of dietOptions) {
         expect(await isOptionSelected(page, option)).toBe(false);
       }
     });

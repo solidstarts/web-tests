@@ -9,9 +9,27 @@ const funnels = ['apple', 'orange', 'banana'];
 const optionsWithDoctorScreen = ["I'm not sure", 'Mild eczema', 'Severe eczema'];
 
 for (const funnel of funnels) {
-  test(`${funnel}: eczema options show allergy risk screen`, async ({ page }) => {
+  test(`${funnel}: eczema options show allergy risk screen`, async ({ page, context }) => {
+    const eczemaUrl = getTestingUrl(`${funnel}/eczema`);
     for (const option of optionsWithDoctorScreen) {
-      await page.goto(getTestingUrl(`${funnel}/eczema`), { waitUntil: 'networkidle' });
+      await context.clearCookies();
+      if (page.url().includes('solidstarts.com')) {
+        await page.evaluate(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+        });
+      }
+      try {
+        await page.goto(eczemaUrl, { waitUntil: 'domcontentloaded' });
+      } catch {
+        // Navigation was interrupted (e.g. redirect). Clear state and retry.
+        await context.clearCookies();
+        await page.evaluate(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+        }).catch(() => {});
+        await page.goto(eczemaUrl, { waitUntil: 'domcontentloaded' });
+      }
       await page.waitForURL(new RegExp(`/${funnel}/eczema`), { timeout: 10_000 });
 
       await page.getByRole('button', { name: option }).click();

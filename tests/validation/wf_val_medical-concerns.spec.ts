@@ -6,7 +6,7 @@ test.use({
 });
 
 const funnels = ['apple', 'orange', 'banana'];
-const supplementsOptions = ['Iron', 'Vitamin D'];
+const concernsOptions = ['Reflux', 'Oral restriction'];
 
 async function getOptionElement(page: any, optionName: string) {
   const button = page.getByRole('button', { name: optionName });
@@ -66,61 +66,61 @@ async function clickOption(page: any, optionName: string) {
 }
 
 for (const funnel of funnels) {
-  test.describe(`${funnel}: Supplements Selector Validation`, () => {
-    test('can select multiple supplements options', async ({ page }) => {
-      await page.goto(getTestingUrl(`${funnel}/nutritional-supplements`));
-      await page.waitForURL(new RegExp(`/${funnel}/nutritional-supplements`), { timeout: 10_000 });
+  test.describe(`${funnel}: Medical concerns Selector Validation`, () => {
+    test('can select multiple concerns options', async ({ page }) => {
+      await page.goto(getTestingUrl(`${funnel}/medical-concerns`));
+      await page.waitForURL(new RegExp(`/${funnel}/medical-concerns`), { timeout: 10_000 });
 
-      await clickOption(page, 'Iron');
-      await clickOption(page, 'Vitamin D');
+      await clickOption(page, 'Reflux');
+      await clickOption(page, 'Oral restriction');
 
-      expect(await isOptionSelected(page, 'Iron')).toBe(true);
-      expect(await isOptionSelected(page, 'Vitamin D')).toBe(true);
+      expect(await isOptionSelected(page, 'Reflux')).toBe(true);
+      expect(await isOptionSelected(page, 'Oral restriction')).toBe(true);
     });
 
     test('selecting No deselects all other options', async ({ page }) => {
-      await page.goto(getTestingUrl(`${funnel}/nutritional-supplements`));
-      await page.waitForURL(new RegExp(`/${funnel}/nutritional-supplements`), { timeout: 10_000 });
+      await page.goto(getTestingUrl(`${funnel}/medical-concerns`));
+      await page.waitForURL(new RegExp(`/${funnel}/medical-concerns`), { timeout: 10_000 });
 
-      await clickOption(page, 'Iron');
-      await clickOption(page, 'Vitamin D');
+      await clickOption(page, 'Reflux');
+      await clickOption(page, 'Oral restriction');
 
-      expect(await isOptionSelected(page, 'Iron')).toBe(true);
-      expect(await isOptionSelected(page, 'Vitamin D')).toBe(true);
+      expect(await isOptionSelected(page, 'Reflux')).toBe(true);
+      expect(await isOptionSelected(page, 'Oral restriction')).toBe(true);
 
       await clickOption(page, 'No');
 
       expect(await isOptionSelected(page, 'No')).toBe(true);
-      for (const option of supplementsOptions) {
+      for (const option of concernsOptions) {
         expect(await isOptionSelected(page, option)).toBe(false);
       }
     });
 
     test('selecting an option after No deselects No', async ({ page }) => {
-      await page.goto(getTestingUrl(`${funnel}/nutritional-supplements`));
-      await page.waitForURL(new RegExp(`/${funnel}/nutritional-supplements`), { timeout: 10_000 });
+      await page.goto(getTestingUrl(`${funnel}/medical-concerns`));
+      await page.waitForURL(new RegExp(`/${funnel}/medical-concerns`), { timeout: 10_000 });
 
       await clickOption(page, 'No');
       expect(await isOptionSelected(page, 'No')).toBe(true);
 
-      await clickOption(page, 'Iron');
+      await clickOption(page, 'Oral restriction');
 
       expect(await isOptionSelected(page, 'No')).toBe(false);
-      expect(await isOptionSelected(page, 'Iron')).toBe(true);
+      expect(await isOptionSelected(page, 'Oral restriction')).toBe(true);
     });
 
     test('tapping an option toggles its selection state', async ({ page }) => {
-      await page.goto(getTestingUrl(`${funnel}/nutritional-supplements`));
-      await page.waitForURL(new RegExp(`/${funnel}/nutritional-supplements`), { timeout: 10_000 });
+      await page.goto(getTestingUrl(`${funnel}/medical-concerns`));
+      await page.waitForURL(new RegExp(`/${funnel}/medical-concerns`), { timeout: 10_000 });
 
-      await clickOption(page, 'Iron');
-      expect(await isOptionSelected(page, 'Iron')).toBe(true);
+      await clickOption(page, 'Oral restriction');
+      expect(await isOptionSelected(page, 'Oral restriction')).toBe(true);
 
-      await clickOption(page, 'Iron');
-      expect(await isOptionSelected(page, 'Iron')).toBe(false);
+      await clickOption(page, 'Oral restriction');
+      expect(await isOptionSelected(page, 'Oral restriction')).toBe(false);
 
-      await clickOption(page, 'Iron');
-      expect(await isOptionSelected(page, 'Iron')).toBe(true);
+      await clickOption(page, 'Oral restriction');
+      expect(await isOptionSelected(page, 'Oral restriction')).toBe(true);
     });
   });
 }
