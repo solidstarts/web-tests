@@ -1,7 +1,7 @@
 import { test, expect, devices } from '@playwright/test';
 import { Page } from '@playwright/test';
-import { getTestingUrl } from '../../utils/getTestingUrl';
-import { next, selectAge, selectName, enterEmailAndContinue } from '../../helpers/wf.helper';
+import { getTestingUrl } from '../../../utils/getTestingUrl';
+import { next, selectAge, selectName, enterEmailAndContinue } from '../../../helpers/wf.helper';
 
 test.use({
   ...devices[process.env.DEVICE as string],
