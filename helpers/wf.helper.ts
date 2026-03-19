@@ -78,14 +78,14 @@ export async function selectName(page: Page, name: string) {
     await next(page);
 }
 
-export async function selectBirthDate(page: Page) {
-    await page.getByRole('button', { name: '2025' }).click();
-    await page.getByRole('button', { name: 'September' }).click();
+export async function selectBirthDate(page: Page, year: string = '2025', month: string = 'September') {
+    await page.getByRole('button', { name: year }).click();
+    await page.getByRole('button', { name: month }).click();
     await next(page);
 }
 
 export async function selectAge(page: Page, age: string='6 months') {
-    await page.getByRole('button', { name: age }).click();
+    await page.getByRole('button', { name: age, exact: true }).click();
 }
 
 export async function next(page: Page, type: 'button' | 'link' = 'button') {
@@ -107,14 +107,13 @@ export async function completeInitialQuestions(page: Page, withNext: boolean=tru
     await page.getByRole('link', { name: 'Got it' }).click();
 }
 
-export async function completeReadinessAssessment(page: Page, hasLetGoAndReadinessAssessment: boolean) {
+export async function completeReadinessAssessment(page: Page, hasLetGoAndReadinessAssessment: boolean, topConcern: string = 'Baby not eating') {
     if (hasLetGoAndReadinessAssessment) await page.waitForURL(new RegExp(`/readiness-assessment`), { timeout: 60_000 });
     if (hasLetGoAndReadinessAssessment) await page.getByRole('link', { name: 'Let\'s go' }).click();
     await page.waitForURL(new RegExp(`/top-concerns`), { timeout: 60_000 });
-    await page.getByRole('button', { name: 'Baby not eating' }).click();
+    await page.getByRole('button', { name: topConcern }).click();
     await next(page);
     await page.getByRole('link', { name: 'Let\'s go' }).click();
-
 }
 
 export async function completeAllergyQuestions(page: Page) {

@@ -16,3 +16,12 @@ test('test', async ({ page }) => {
   }), childName, getCardDetails(), [6.99, 3.49], shouldPay);
 });
 
+
+
+const helloworld = 'hello';
+
+function printWord(word: string) {
+  console.log(word);
+}
+
+printWord(helloworld)
